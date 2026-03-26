@@ -80,22 +80,28 @@ export async function POST(request: Request) {
         if (activityRes.ok) {
           const activityData = await activityRes.json()
           
-          // 4. Insert into database using upsert
-          await supabaseAdmin
-            .from('activities')
-            .upsert({
-              user_id: profile.id,
-              strava_activity_id: activityId,
-              name: activityData.name,
-              distance: activityData.distance,
-              moving_time: activityData.moving_time,
-              start_date: activityData.start_date,
-              type: activityData.type,
-            }, {
-              onConflict: 'strava_activity_id'
-            })
-            
-          console.log(`Successfully imported activity ${activityId} for user ${profile.id}`)
+          const allowedTypes = ['Run', 'TrailRun', 'VirtualRun', 'Walk', 'Hike']
+
+          if (allowedTypes.includes(activityData.type)) {
+            // 4. Insert into database using upsert
+            await supabaseAdmin
+              .from('activities')
+              .upsert({
+                user_id: profile.id,
+                strava_activity_id: activityId,
+                name: activityData.name,
+                distance: activityData.distance,
+                moving_time: activityData.moving_time,
+                start_date: activityData.start_date,
+                type: activityData.type,
+              }, {
+                onConflict: 'strava_activity_id'
+              })
+              
+            console.log(`Successfully imported activity ${activityId} for user ${profile.id}`)
+          } else {
+            console.log(`Ignored activity ${activityId} due to unallowed type: ${activityData.type}`)
+          }
         }
       }
     }

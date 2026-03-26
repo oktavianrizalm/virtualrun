@@ -69,8 +69,11 @@ export async function GET(request: Request) {
     if (activitiesRes.ok) {
       const historicalActivities = await activitiesRes.json()
       
-      const runsToInsert = historicalActivities.map((act: any) => ({
-        user_id: user.id,
+      const allowedTypes = ['Run', 'TrailRun', 'VirtualRun', 'Walk', 'Hike']
+      const runsToInsert = historicalActivities
+        .filter((act: any) => allowedTypes.includes(act.type))
+        .map((act: any) => ({
+          user_id: user.id,
         strava_activity_id: act.id.toString(),
         name: act.name,
         distance: act.distance,
