@@ -69,7 +69,7 @@ export default async function RootLayout({
                 <>
                   <Link href="/login" className="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors text-3xl hidden md:block">account_circle</Link>
                   <Link href="/login" className="bg-primary-container text-on-primary-container font-headline font-bold px-5 py-2 rounded-lg scale-95 duration-200 active:opacity-80 hover:scale-100 transition-all shadow-[0_0_15px_rgba(0,203,230,0.2)] hover:shadow-[0_0_25px_rgba(0,203,230,0.4)]">
-                    Register Now
+                    Login / Register
                   </Link>
                 </>
               )}
