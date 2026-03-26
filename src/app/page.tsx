@@ -1,6 +1,34 @@
 import Link from 'next/link'
+import { createClient } from '@/utils/supabase/server'
 
-export default function Home() {
+export const revalidate = 60
+
+export default async function Home() {
+  const supabase = await createClient()
+  
+  const { count: totalAthletes } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+
+  const { data: activities } = await supabase
+    .from('activities')
+    .select('distance')
+
+  let totalDistanceKm = 0
+  if (activities) {
+    const totalMeters = activities.reduce((sum, act) => sum + (act.distance || 0), 0)
+    totalDistanceKm = totalMeters / 1000
+  }
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
+    if (num >= 1000) return (num / 1000).toFixed(1) + 'k'
+    return Math.floor(num).toLocaleString()
+  }
+
+  const athletesStr = totalAthletes ? formatNumber(totalAthletes) : '0'
+  const distanceStr = formatNumber(totalDistanceKm)
+
   return (
     <main className="relative min-h-screen pt-20">
       {/* Atmospheric Background Layers */}
@@ -74,11 +102,11 @@ export default function Home() {
           </p>
           <div className="flex gap-8">
             <div>
-              <div className="text-4xl font-black font-headline text-primary-dim">14.2M</div>
+              <div className="text-4xl font-black font-headline text-primary-dim">{distanceStr}</div>
               <div className="text-label text-xs uppercase tracking-widest text-on-surface-variant mt-1">KM TRACKED</div>
             </div>
             <div>
-              <div className="text-4xl font-black font-headline text-secondary">204k</div>
+              <div className="text-4xl font-black font-headline text-secondary">{athletesStr}</div>
               <div className="text-label text-xs uppercase tracking-widest text-on-surface-variant mt-1">ATHLETES</div>
             </div>
           </div>
