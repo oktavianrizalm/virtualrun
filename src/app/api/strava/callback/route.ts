@@ -57,5 +57,46 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL('/dashboard?error=profile_update_failed', request.url))
   }
 
+  // --- FITUR BARU: Tarik Data Lari 10 Hari Terakhir ---
+  try {
+    const tenDaysAgo = Math.floor(Date.now() / 1000) - (10 * 24 * 60 * 60)
+    
+    // Perintah fetch ke endpoint activities milik Strava
+    const activitiesRes = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${tenDaysAgo}&per_page=30`, {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    })
+
+    if (activitiesRes.ok) {
+      const historicalActivities = await activitiesRes.json()
+      
+      const runsToInsert = historicalActivities.map((act: any) => ({
+        user_id: user.id,
+        strava_activity_id: act.id.toString(),
+        name: act.name,
+        distance: act.distance,
+        moving_time: act.moving_time,
+        start_date: act.start_date,
+        type: act.type,
+      }))
+
+      if (runsToInsert.length > 0) {
+        // Upsert mencegah munculnya data ganda (duplikat) jika user menghubungkan ulang
+        const { error: insertError } = await supabase
+          .from('activities')
+          .upsert(runsToInsert, { onConflict: 'strava_activity_id' })
+          
+        if (insertError) {
+          console.error('Gagal memasukkan data lari masa lalu:', insertError)
+        } else {
+          console.log(`Berhasil menarik dan menyimpan ${runsToInsert.length} aktivitas lari`)
+        }
+      }
+    } else {
+      console.error('Gagal mengambil history dari Strava:', await activitiesRes.text())
+    }
+  } catch (err) {
+    console.error('Terjadi kesalahan sistem saat menarik data masa lalu:', err)
+  }
+
   return NextResponse.redirect(new URL('/dashboard', request.url))
 }
