@@ -9,26 +9,6 @@ export async function signup(formData: FormData) {
 
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirm_password') as string
-  const captchaToken = formData.get('captchaToken') as string
-
-  // Validasi: reCAPTCHA harus diisi
-  if (!captchaToken) {
-    redirect('/error?message=Mohon selesaikan verifikasi reCAPTCHA terlebih dahulu')
-  }
-
-  // Verifikasi reCAPTCHA manual ke Google (Server-to-Server)
-  const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY
-  if (recaptchaSecret) {
-    const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${recaptchaSecret}&response=${captchaToken}`
-    })
-    const verifyData = await verifyRes.json()
-    if (!verifyData.success) {
-      redirect('/error?message=Verifikasi reCAPTCHA gagal, bot terdeteksi.')
-    }
-  }
 
   // Validasi: pastikan password dan konfirmasi sama
   if (password !== confirmPassword) {

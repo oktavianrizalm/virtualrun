@@ -2,12 +2,8 @@
 
 import { signup } from './actions'
 import Link from 'next/link'
-import ReCAPTCHA from 'react-google-recaptcha'
-import { useState } from 'react'
 
 export default function SignupPage() {
-  const [captchaValue, setCaptchaValue] = useState<string | null>(null)
-
   return (
     <div className="flex min-h-[calc(100vh-80px)] mt-20 w-full items-center justify-center bg-[#0e0e10] px-4 py-12 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#68fcbf]/5 rounded-full blur-[120px] pointer-events-none"></div>
@@ -90,15 +86,6 @@ export default function SignupPage() {
               type="password"
               required
             />
-          </div>
-          
-          <div className="pt-2 flex justify-center w-full">
-            <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Menggunakan Google test key sebagai cadangan bawaan
-              onChange={(val) => setCaptchaValue(val)}
-              theme="dark"
-            />
-            <input type="hidden" name="captchaToken" value={captchaValue || ''} />
           </div>
           
           <div className="flex flex-col gap-4 pt-4">
