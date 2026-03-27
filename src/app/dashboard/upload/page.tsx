@@ -40,10 +40,48 @@ export default function UploadScreenshotPage() {
          setDistance(distanceMatch[1].replace(',', '.'))
       }
       
-      // Auto-extract Time (mencari pola waktu seperti 00:00:00 atau 00:00)
-      const timeMatch = text.match(/(\d{1,2}:\d{2}(:\d{2})?)/)
-      if (timeMatch) {
-         setTime(timeMatch[1])
+      // Auto-extract Time
+      let parsedTime = ''
+      let h = 0, m = 0, s = 0
+      
+      // Pola 1: Format teks spesifik Apple Watch / Indonesia (contoh: 1j 25m atau 27m 0d)
+      const hMatch = text.match(/(\d+)\s*(?:j|h|jam|hour)s?\b/i)
+      if (hMatch) h = parseInt(hMatch[1])
+
+      const mMatch = text.match(/(\d+)\s*(?:m|menit|min)s?\b/i)
+      if (mMatch) m = parseInt(mMatch[1])
+
+      const sMatch = text.match(/(\d+)\s*(?:d|s|detik|sec)s?\b/i)
+      if (sMatch) s = parseInt(sMatch[1])
+
+      if (h > 0 || m > 0 || s > 0) {
+         parsedTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+      } 
+      
+      // Pola 2: Fallback ke format standar HH:MM:SS atau MM:SS jika tidak ada teks jam/menit
+      if (!parsedTime) {
+         const time3Part = text.match(/(\d{1,2}:\d{2}:\d{2})/)
+         if (time3Part) {
+            parsedTime = time3Part[1].padStart(8, '0')
+         } else {
+            // Mencoba mencari kata kunci Waktu/Time sebelum MM:SS agar tidak tertukar dengan Pace (Kecepatan)
+            const waktuDuaPart = text.match(/(?:Waktu|Time|Duration)[\s\n]*(\d{1,2}:\d{2})/i)
+            if (waktuDuaPart) {
+               const parts = waktuDuaPart[1].split(':')
+               parsedTime = `00:${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`
+            } else {
+               // Upaya terakhir, ambil sembarang format MM:SS
+               const fallbackMatch = text.match(/(\d{1,2}:\d{2})/)
+               if (fallbackMatch) {
+                  const parts = fallbackMatch[1].split(':')
+                  parsedTime = `00:${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`
+               }
+            }
+         }
+      }
+
+      if (parsedTime) {
+         setTime(parsedTime)
       }
     } catch (err) {
       console.error('OCR Error:', err)
