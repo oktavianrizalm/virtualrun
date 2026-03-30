@@ -58,6 +58,9 @@ export default async function RootLayout({
                     <Link href="/dashboard" className="block px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors">
                       Dashboard
                     </Link>
+                    <Link href="/settings" className="block px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors border-t border-zinc-800">
+                      Settings
+                    </Link>
                     <form action="/auth/signout" method="post" className="border-t border-zinc-800">
                       <button className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-zinc-800 hover:text-red-400 transition-colors">
                         Log Out

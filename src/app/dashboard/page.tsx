@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { disconnectStrava } from './actions'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -78,6 +79,11 @@ export default async function DashboardPage() {
                 >
                   📸 Upload Manual Screenshot
                 </Link>
+                <form action={disconnectStrava}>
+                  <button type="submit" className="inline-flex items-center justify-center gap-2 text-rose-400 font-medium bg-rose-950/30 hover:bg-rose-900/40 px-5 py-3 rounded-xl border border-rose-900/50 hover:border-rose-500/50 transition-colors text-sm cursor-pointer shadow-[0_0_15px_rgba(244,63,94,0.05)]">
+                    Disconnect
+                  </button>
+                </form>
               </div>
               <p className="text-zinc-400">Your activities will automatically appear here shortly after you finish a run.</p>
             </div>
