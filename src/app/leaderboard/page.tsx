@@ -5,10 +5,10 @@ export const revalidate = 60
 export default async function LeaderboardPage() {
   const supabase = await createClient()
 
-  // Tarik data activities termasuk moving_time
   const { data: activities, error } = await supabase
     .from('activities')
     .select('user_id, distance, moving_time, profiles(full_name)')
+    .eq('approval_status', 'approved')
 
   if (error) {
     console.error(error)

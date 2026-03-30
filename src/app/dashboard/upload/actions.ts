@@ -78,7 +78,8 @@ export async function submitManualRun(formData: FormData) {
       moving_time: movingTimeSeconds,
       start_date: new Date().toISOString(),
       type: 'Run',
-      manual_proof_url: publicUrl
+      manual_proof_url: publicUrl,
+      approval_status: 'pending'
     })
 
   if (insertError) {

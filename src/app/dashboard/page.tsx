@@ -101,7 +101,15 @@ export default async function DashboardPage() {
                 {activities.map((activity) => (
                   <div key={activity.id} className="bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 p-5 rounded-2xl flex items-center justify-between transition-colors shadow-lg">
                     <div className="space-y-1">
-                      <h4 className="font-semibold text-lg text-zinc-100">{activity.name}</h4>
+                      <div className="flex items-center gap-3">
+                        <h4 className="font-semibold text-lg text-zinc-100">{activity.name}</h4>
+                        {activity.approval_status === 'pending' && (
+                          <span className="bg-amber-950/50 text-amber-400 border border-amber-900/50 text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full">Pending Analysis</span>
+                        )}
+                        {activity.approval_status === 'rejected' && (
+                          <span className="bg-rose-950/50 text-rose-400 border border-rose-900/50 text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full">Rejected</span>
+                        )}
+                      </div>
                       <p className="text-zinc-400 text-sm">{new Date(activity.start_date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     </div>
                     <div className="text-right">
