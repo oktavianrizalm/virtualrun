@@ -19,6 +19,12 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  
+  let role = 'user'
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+    if (profile) role = profile.role
+  }
 
   return (
     <html lang="en" className="dark scroll-smooth w-full overflow-x-hidden">
@@ -61,6 +67,11 @@ export default async function RootLayout({
                     <Link href="/settings" className="block px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors border-t border-zinc-800">
                       Settings
                     </Link>
+                    {(role === 'admin' || role === 'moderator') && (
+                      <Link href="/admin" className="block px-4 py-3 text-sm text-fuchsia-400 font-bold hover:bg-zinc-800 hover:text-fuchsia-300 transition-colors border-t border-zinc-800">
+                        Admin Panel ({role})
+                      </Link>
+                    )}
                     <form action="/auth/signout" method="post" className="border-t border-zinc-800">
                       <button className="w-full text-left px-4 py-3 text-sm text-red-500 font-medium hover:bg-zinc-800 hover:text-red-400 transition-colors">
                         Log Out
