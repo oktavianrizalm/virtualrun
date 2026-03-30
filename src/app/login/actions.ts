@@ -3,46 +3,32 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { logger } from '@/utils/logger'
 
 export async function login(formData: FormData) {
-  const supabase = await createClient()
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
 
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  // Validasi input sisi server
+  if (!email || !password) {
+    redirect('/error?message=Email dan password wajib diisi')
   }
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(email)) {
+    redirect('/error?message=Format email tidak valid')
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
-    console.error('Login error:', error.message)
+    logger.log('security', 'Failed login attempt', { email, error: error.message })
     redirect(`/error?message=${encodeURIComponent(error.message)}`)
   }
 
+  logger.log('info', 'Successful login', { email })
   revalidatePath('/', 'layout')
-  redirect('/dashboard') // Redirect to dashboard after login
-}
-
-export async function signup(formData: FormData) {
-  const supabase = await createClient()
-
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-    options: {
-      data: {
-        full_name: formData.get('full_name') as string,
-      }
-    }
-  }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    console.error('Signup error:', error.message)
-    redirect(`/error?message=${encodeURIComponent(error.message)}`)
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/dashboard') // Redirect after signup
+  redirect('/dashboard')
 }

@@ -42,7 +42,7 @@ export default function LoginPage() {
               <label className="text-[10px] font-bold text-[#68fcbf] uppercase tracking-widest" htmlFor="password">
                 Password
               </label>
-              <a href="#" className="text-[10px] font-bold text-[#5c5f66] hover:text-[#3adffa] transition-colors uppercase tracking-widest">Forgot?</a>
+              <Link href="/forgot-password" className="text-[10px] font-bold text-[#5c5f66] hover:text-[#3adffa] transition-colors uppercase tracking-widest">Forgot?</Link>
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#5c5f66]">
