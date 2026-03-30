@@ -11,28 +11,8 @@ export async function signup(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const confirmPassword = formData.get('confirm_password') as string
-  const captchaToken = formData.get('captchaToken') as string
   const phone = formData.get('phone') as string
   const full_name = formData.get('full_name') as string
-
-  // Validasi: reCAPTCHA harus diisi
-  if (!captchaToken) {
-    redirect('/error?message=Mohon centang kotak keamanan (reCAPTCHA) terlebih dahulu')
-  }
-
-  // Verifikasi reCAPTCHA ke API Google
-  const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY
-  if (recaptchaSecret) {
-    const verifyRes = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `secret=${recaptchaSecret}&response=${captchaToken}`
-    })
-    const verifyData = await verifyRes.json()
-    if (!verifyData.success) {
-      redirect('/error?message=Sistem keamanan mendeteksi percobaan robot. Silakan coba lagi.')
-    }
-  }
 
   // Validasi Format Server
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
